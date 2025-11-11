@@ -5,32 +5,28 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 type ChatMessage = {
-    role: 'user' | 'assistant';
-    content: string;
+  role: 'user' | 'assistant';
+  content: string;
 };
 
 export default function ChatWidget() {
-    const [isOpen, setIsOpen] = useState(false);
-    const [messages, setMessages] = useState<ChatMessage[]>([
-        {
-            role: 'assistant',
-            content:
-                'Hai! Saya asisten virtual Aghatis. Ada yang bisa saya bantu hari ini?',
-        },
-    ]);
-    const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const listRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>(
+    [ { role: 'assistant', content: 'Hai! Saya asisten virtual Aghatis. Ada yang bisa saya bantu hari ini?' } ]
+  );
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (listRef.current) {
-            listRef.current.scrollTop = listRef.current.scrollHeight;
-        }
-    }, [messages, isTyping, isOpen]);
+  useEffect(() => {
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [messages, isTyping, isOpen]);
 
-    const canSend = useMemo(() => input.trim().length > 0 && !isTyping, [input, isTyping]);
+  const canSend = useMemo(() => input.trim().length > 0 && !isTyping, [input, isTyping]);
 
-    const isDisallowedContent = (text: string) => {
+  const isDisallowedContent = (text: string) => {
         // Normalisasi sederhana untuk menangkap variasi/obfuscation
         const normalize = (s: string) => s
             .toLowerCase()
@@ -60,12 +56,12 @@ export default function ChatWidget() {
             'cazzo',
         ].map(normalize);
 
-        return banned.some((b) => t.includes(b));
-    };
+    return banned.some((b) => t.includes(b));
+  };
 
-    const sendMessage = async () => {
-        const text = input.trim();
-        if (!text) return;
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text) return;
 
         // Blokir kata kasar: silent block (tidak tampil, tidak kirim, tanpa balasan)
         if (isDisallowedContent(text)) {
@@ -75,12 +71,9 @@ export default function ChatWidget() {
         }
         setInput('');
 
-        const nextMessages: ChatMessage[] = [
-            ...messages,
-            { role: 'user', content: text },
-        ];
-        setMessages(nextMessages);
-        setIsTyping(true);
+    const nextMessages: ChatMessage[] = [ ...messages, { role: 'user', content: text }, ];
+    setMessages(nextMessages);
+    setIsTyping(true);
 
         try {
             const res = await fetch('/api/chat', {
@@ -92,26 +85,26 @@ export default function ChatWidget() {
             if (!res.ok) {
                 throw new Error('Gagal memanggil API chat');
             }
-            const data = await res.json();
-            const reply = (data?.reply as string) ?? 'Maaf, terjadi kesalahan.';
+      const data = await res.json();
+      const reply = (data?.reply as string) ?? 'Maaf, terjadi kesalahan.';
 
-            setMessages((prev) => [...prev, { role: 'assistant', content: reply }]);
-        } catch (err) {
-            setMessages((prev) => [
-                ...prev,
-                { role: 'assistant', content: 'Maaf, terjadi kesalahan pada server. Coba lagi nanti.' },
-            ]);
-        } finally {
-            setIsTyping(false);
-        }
-    };
+      setMessages((prev) => [ ...prev, { role: 'assistant', content: reply } ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'assistant', content: 'Maaf, terjadi kesalahan pada server. Coba lagi nanti.' },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
-    const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
-        if (e.key === 'Enter' && canSend) {
-            e.preventDefault();
-            sendMessage();
-        }
-    };
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === 'Enter' && canSend) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
     return (
         <div className="fixed bottom-4 right-4 z-[60]">

@@ -52,7 +52,7 @@ function isRelatedToAghatis(text: string): boolean {
     // contoh proyek yang disebutkan
     'barterin', 'termicons',
     // sapaan & bantuan (anggap in-scope untuk front office)
-    'halo', 'hallo', 'hai', 'hello', 'hey', 'permisi', 'butuh bantuan', 'minta bantuan', 'bisa bantu', 'tolong', 'help', 'ada yang bisa dibantu'
+    'halo', 'hallo', 'hai', 'hello', 'hey', 'permisi', 'butuh bantuan', 'minta bantuan', 'bisa bantu', 'tolong', 'help', 'ada yang bisa dibantu',
   ];
   return keywords.some((k) => t.includes(k));
 }
@@ -64,7 +64,7 @@ function isGreetingOrHelp(text: string): boolean {
     'butuh bantuan', 'minta bantuan', 'bisa bantu', 'tolong', 'help',
     'saya perlu bantuan', 'saya butuh bantuan', 'apakah bisa bantu', 'ada yang bisa dibantu',
     // intent umum/ambiguous
-    'saya kepo', 'kepo', 'penasaran', 'bingung', 'mau tanya', 'mau nanya', 'ada pertanyaan'
+    'saya kepo', 'kepo', 'penasaran', 'bingung', 'mau tanya', 'mau nanya', 'ada pertanyaan',
   ];
   return phrases.some((p) => t.includes(p));
 }
@@ -122,13 +122,13 @@ function generateFallbackReply(text: string): string {
 export async function POST(req: Request) {
   try {
     const body = (await req.json()) as { messages?: ChatMessage[] };
-    const history = body.messages ?? [];
+    const history = body.messages ?? [ ];
 
     const lastUser = [...history].reverse().find((m) => m.role === 'user');
     const lastUserText = lastUser?.content ?? '';
 
     // Tambahkan petunjuk dinamis sebagai system messages agar jawaban mengikuti aturan
-    const extraSystem: { role: 'system'; content: string }[] = [];
+    const extraSystem: { role: 'system'; content: string }[] = [ ];
     if (isGreetingOrHelp(lastUserText)) {
       extraSystem.push({
         role: 'system',
@@ -180,7 +180,7 @@ export async function POST(req: Request) {
     const raw = completion.choices?.[0]?.message?.content?.trim() || generateFallbackReply(lastUserText);
     const reply = sanitizeReply(raw);
     return NextResponse.json({ reply });
-  } catch (err) {
+  } catch {
     // Fallback tanpa error status agar UI tidak memunculkan pesan gagal server
     const reply = sanitizeReply(generateFallbackReply(''));
     return NextResponse.json({ reply });
