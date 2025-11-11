@@ -130,7 +130,7 @@ export default function ChatWidget() {
             <div
                 className={[
                     'fixed bottom-4 right-4 max-w-[calc(100vw-2rem)]',
-                    'rounded-2xl shadow-2xl border border-black/10 overflow-hidden',
+                    'rounded-2xl shadow-2xl overflow-hidden',
                     'transition-all duration-300',
                     isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none',
                 ].join(' ')}

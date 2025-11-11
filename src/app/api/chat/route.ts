@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+// Ensure Node.js runtime and sufficient timeout on Vercel
+export const runtime = 'nodejs';
+export const maxDuration = 30; // seconds
 
 type ChatMessage = {
   role: 'user' | 'assistant';
