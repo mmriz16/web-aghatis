@@ -5,8 +5,6 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function Service() {
   const serviceRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -14,6 +12,10 @@ export function Service() {
   const cardsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Register GSAP plugins only in the browser
+    if (typeof window !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+    }
     const ctx = gsap.context(() => {
       // Set initial states
       gsap.set([ headerRef.current, buttonRef.current ], {

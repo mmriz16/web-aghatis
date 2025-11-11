@@ -1,10 +1,12 @@
 import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono as GeistMono, Plus_Jakarta_Sans as PlusJakartaSans } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+// import { Analytics } from '@vercel/analytics/react';
+// import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 import SmoothScrollProvider from './components/smooth-scroll-provider';
+import './lib/ssr-localstorage';
+import ChatWidget from './components/ChatWidget';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -83,8 +85,8 @@ export default function RootLayout({
         <SmoothScrollProvider>
           {children}
         </SmoothScrollProvider>
-        <Analytics />
-        <SpeedInsights />
+        <ChatWidget />
+        {/* Analytics disabled during debug to avoid SSR localStorage issues */}
       </body>
     </html>
   );

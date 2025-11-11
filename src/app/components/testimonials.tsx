@@ -5,8 +5,6 @@ import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function Testimonials() {
   const testimonialsRef = useRef<HTMLDivElement>(null);
   const quoteRef = useRef<HTMLImageElement>(null);
@@ -15,6 +13,9 @@ export function Testimonials() {
   const buttonsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+    }
     const ctx = gsap.context(() => {
       // Set initial states
       gsap.set(quoteRef.current, {
