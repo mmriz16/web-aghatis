@@ -19,6 +19,15 @@ body {
   font-family: var(--font-plus-jakarta-sans), var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Hide website scrollbars globally but keep scrolling */
+html, body {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
 /* Hide scrollbars but keep scrolling */
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
