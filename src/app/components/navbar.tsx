@@ -134,7 +134,7 @@ export function Navbar() {
                 <Linkedin size={20} className="mr-1" />
               </a>
             </li>
-            <a href="https://wa.me/628814547922" target="_blank"><button className="bg-[#00704A] hover:bg-[#00704A]/80 transition-colors duration-300 rounded-[16px] text-sm text-white px-5 py-3 cursor-pointer">Contact</button></a>
+            <a href="https://wa.me/628814547922?text=Hai%20Aghatis!%20Saya%20ingin%20konsultasi%20terkait%20pembuatan%20website%20atau%20aplikasi.%20Apakah%20bisa%20dibantu%3F" target="_blank"><button className="bg-[#00704A] hover:bg-[#00704A]/80 transition-colors duration-300 rounded-[16px] text-sm text-white px-5 py-3 cursor-pointer">Contact</button></a>
           </ul>
         </div>
       </div>
