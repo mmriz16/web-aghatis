@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { Instagram, Linkedin } from 'lucide-react';
+import Link from 'next/link';
 
 export function Navbar() {
   const [ isDarkBackground, setIsDarkBackground ] = useState(true);
@@ -96,7 +97,7 @@ export function Navbar() {
     >
       <div className="container mx-auto max-w-7xl py-3">
         <div className="flex justify-between items-center">
-          <div className="h-[54px] relative w-[178px]">
+          <Link href="/" aria-label="Go to Home" className="h-[54px] relative w-[178px] block">
             {isDarkBackground ? (
               <Image
                 src="/app/img/logo-dark.png"
@@ -116,12 +117,20 @@ export function Navbar() {
                 priority
               />
             )}
-          </div>
+          </Link>
           <ul className="flex gap-6">
-            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">Home</li>
-            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">Services</li>
-            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">Portfolio</li>
-            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">About</li>
+            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">
+              <Link href="/">Home</Link>
+            </li>
+            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">
+              <Link href="/pages/about">About</Link>
+            </li>
+            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">
+              <Link href="/pages/services">Services</Link>
+            </li>
+            <li className="hover:text-[#00A06A] cursor-pointer transition-colors">
+              <Link href="/pages/portfolio">Portfolio</Link>
+            </li>
           </ul>
           <ul className="flex gap-6">
             <li className="hover:text-[#00A06A] cursor-pointer transition-colors flex items-center">
