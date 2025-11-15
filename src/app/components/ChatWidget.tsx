@@ -21,6 +21,8 @@ export default function ChatWidget() {
     );
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [devLogItems, setDevLogItems] = useState<Array<{ date: string; message: string }>>([]);
+    const [devLogLoading, setDevLogLoading] = useState(false);
     const listRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const logRef = useRef<HTMLDivElement>(null);
@@ -57,6 +59,23 @@ export default function ChatWidget() {
     }, [stage]);
 
     useEffect(() => {
+        if (stage === 'log' && isOpen) {
+            const owner = process.env.NEXT_PUBLIC_GITHUB_OWNER;
+            const repo = process.env.NEXT_PUBLIC_GITHUB_REPO;
+            const qs = owner && repo ? `?owner=${owner}&repo=${repo}&per_page=50` : '';
+            setDevLogLoading(true);
+            fetch(`/api/devlog${qs}`)
+                .then((r) => r.json())
+                .then((d) => {
+                    const items = Array.isArray(d?.items) ? d.items : [];
+                    setDevLogItems(items);
+                })
+                .catch(() => {})
+                .finally(() => setDevLogLoading(false));
+        }
+    }, [stage, isOpen]);
+
+    useEffect(() => {
         if (stage === 'log' && logRef.current) {
             logLenisRef.current?.destroy?.();
             logLenisRef.current = new Lenis({
@@ -74,6 +93,19 @@ export default function ChatWidget() {
     }, [stage]);
 
     const canSend = useMemo(() => input.trim().length > 0 && !isTyping, [input, isTyping]);
+
+    const devLogGrouped = useMemo(() => {
+        const map = new Map<string, string[]>();
+        for (const it of devLogItems) {
+            const d = it.date ? new Date(it.date) : null;
+            const label = d ? d.toLocaleString('en-US', { month: 'long', year: 'numeric' }) : 'Unknown';
+            const firstLine = (it.message || '').split('\n')[0];
+            const arr = map.get(label) ?? [];
+            arr.push(firstLine);
+            map.set(label, arr);
+        }
+        return Array.from(map.entries()).map(([month, messages]) => ({ month, messages }));
+    }, [devLogItems]);
 
     const isDisallowedContent = (text: string) => {
         // Normalisasi sederhana untuk menangkap variasi/obfuscation
@@ -275,83 +307,36 @@ export default function ChatWidget() {
                                 className="mt-6 flex-1 overflow-y-auto no-scrollbar overscroll-contain"
                                 style={{ overscrollBehavior: 'contain', touchAction: 'pan-y' }}
                             >
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">November 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">AI Assistant Improvements</div>
-                                    <p className="text-sm mt-1">Respons lebih cepat dan render Markdown lebih baik.</p>
-                                    <p className="text-sm">Optimasi pemanggilan API dan pengurangan latensi rata-rata 30%.</p>
-                                    <p className="text-sm">Pembaruan UI untuk konsistensi tipografi dan spacing.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Oktober 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Peningkatan Keamanan</div>
-                                    <p className="text-sm mt-1">Validasi konten pengguna dan penanganan error diperkuat.</p>
-                                    <p className="text-sm">Tambah rate-limit untuk mencegah spam dan abuse.</p>
-                                    <p className="text-sm">Audit dependensi dan patch kerentanan kecil.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">September 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Performance & Accessibility</div>
-                                    <p className="text-sm mt-1">Perbaikan ARIA labels untuk aksesibilitas.</p>
-                                    <p className="text-sm">Lazy-load komponen non-kritis untuk TTI lebih cepat.</p>
-                                    <p className="text-sm">Pengurangan layout shift pada elemen interaktif.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Agustus 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">New Chat Features</div>
-                                    <p className="text-sm mt-1">Auto-scroll daftar pesan dengan overscroll containment.</p>
-                                    <p className="text-sm">Shortcut Enter untuk kirim dan fokus otomatis ke input.</p>
-                                    <p className="text-sm">Penataan balon chat untuk keterbacaan konten.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Juli 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">API Stability</div>
-                                    <p className="text-sm mt-1">Fallback pesan saat server error untuk pengalaman mulus.</p>
-                                    <p className="text-sm">Retry ringan untuk intermiten jaringan.</p>
-                                    <p className="text-sm">Monitoring dasar waktu respons.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Juni 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">UI Polish</div>
-                                    <p className="text-sm mt-1">Penyatuan warna tombol dan efek hover.</p>
-                                    <p className="text-sm">Penyesuaian border dan radius untuk konsistensi.</p>
-                                    <p className="text-sm">Perbaikan kontras teks pada background gradasi.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Mei 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Content Filtering</div>
-                                    <p className="text-sm mt-1">Normalisasi input dan blokir kata kasar lintas bahasa.</p>
-                                    <p className="text-sm">Silent-block untuk mencegah balasan tidak pantas.</p>
-                                    <p className="text-sm">Penambahan daftar kata yang sering disalahgunakan.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">April 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Markdown Rendering</div>
-                                    <p className="text-sm mt-1">Dukungan GFM: list, bold, italic, dan heading.</p>
-                                    <p className="text-sm">Penyetelan komponen ReactMarkdown agar tipografi rapi.</p>
-                                    <p className="text-sm">Perbaikan whitespace untuk pesan panjang.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Maret 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Widget Controls</div>
-                                    <p className="text-sm mt-1">Tombol toggle tetap terlihat untuk buka/tutup widget.</p>
-                                    <p className="text-sm">Animasi transisi masuk/keluar yang halus.</p>
-                                    <p className="text-sm">Posisi fixed agar mudah diakses.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Februari 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Intro Experience</div>
-                                    <p className="text-sm mt-1">Halaman intro dengan pilihan Chat dan What’s New.</p>
-                                    <p className="text-sm">Logo bundar dan teks pengantar ringkas.</p>
-                                    <p className="text-sm">Navigasi antar stage yang intuitif.</p>
-                                </div>
-                                <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
-                                    <div className="text-xs text-black/50">Januari 2025</div>
-                                    <div className="text-sm font-medium mt-1 text-[#00A06A]">Initial Release</div>
-                                    <p className="text-sm mt-1">Rilis awal widget chat Aghatis AI.</p>
-                                    <p className="text-sm">Kirim pesan, balasan asisten, dan scroll daftar.</p>
-                                    <p className="text-sm">Struktur komponen dasar dan state manajemen.</p>
-                                </div>
+                                {devLogLoading && (
+                                    <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">Memuat…</div>
+                                )}
+                                {devLogGrouped.length > 0 ? (
+                                    devLogGrouped.map((g) => (
+                                        <div key={g.month} className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
+                                            <div className="text-xs text-black/50">{g.month}</div>
+                                            {g.messages.slice(0, 4).map((m, i) => (
+                                                <p key={i} className="text-sm mt-1">{m}</p>
+                                            ))}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <>
+                                        <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
+                                            <div className="text-xs text-black/50">November 2025</div>
+                                            <div className="text-sm font-medium mt-1 text-[#00A06A]">AI Assistant Improvements</div>
+                                            <p className="text-sm mt-1">Respons lebih cepat dan render Markdown lebih baik.</p>
+                                            <p className="text-sm">Optimasi pemanggilan API dan pengurangan latensi rata-rata 30%.</p>
+                                            <p className="text-sm">Pembaruan UI untuk konsistensi tipografi dan spacing.</p>
+                                        </div>
+                                        <div className="bg-white rounded-xl border border-black/10 p-4 mb-3 text-black/70">
+                                            <div className="text-xs text-black/50">Oktober 2025</div>
+                                            <div className="text-sm font-medium mt-1 text-[#00A06A]">Peningkatan Keamanan</div>
+                                            <p className="text-sm mt-1">Validasi konten pengguna dan penanganan error diperkuat.</p>
+                                            <p className="text-sm">Tambah rate-limit untuk mencegah spam dan abuse.</p>
+                                            <p className="text-sm">Audit dependensi dan patch kerentanan kecil.</p>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}
